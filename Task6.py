@@ -36,47 +36,34 @@ for i in xrange(1, N + 1):
 
 
 M = [0.0 for i in range(N)]
-for i in xrange(1, N):
-    mi = ((h ** 2) * q(x_values[i]) - 2) / (1 + (h / 2) * p(x_values[i]))
-    M[i] = mi
-
 K = [0.0 for i in range(N)]
-for i in xrange(1, N):
-    ki = (1 - (h / 2) * p(x_values[i])) / (1 + (h / 2) * p(x_values[i]))
-    K[i] = ki
-
 F = [0.0 for i in range(N)]
-for i in xrange(1, N):
-    fi = f(x_values[i]) / (1 + (h / 2) * p(x_values[i]))
-    F[i] = fi
-
-
 C = []
-C.append((alpha1 / (h * alpha0 - alpha1)))
-for i in xrange(1, N):
-    ci = 1 / (M[i] - K[i] * C[i - 1])
-    C.append(ci)
-
 D = []
 D.append(A * h / (h * alpha0 - alpha1))
+C.append((alpha1 / (h * alpha0 - alpha1)))
 for i in xrange(1, N):
-    di = C[i] * ((h ** 2) * F[i] - K[i] * D[i - 1])
-    D.append(di)
-
-y_values = [0.0 for i in xrange(N + 1)]
-Yn = (B * h + betha1 * D[N - 1]) / (betha0 * h + betha1 * (C[N - 1] + 1))
-y_values[N] = Yn
-for i in xrange(N - 1, 0, -1):
-    y_values[i] = D[i] - C[i] * y_values[i + 1]
+    M[i] = ((h ** 2) * q(x_values[i]) - 2) / (1 + (h / 2) * p(x_values[i]))
+    K[i] = (1 - (h / 2) * p(x_values[i])) / (1 + (h / 2) * p(x_values[i]))
+    F[i] = f(x_values[i]) / (1 + (h / 2) * p(x_values[i]))
+    C.append(1 / (M[i] - K[i] * C[i - 1]))
+    D.append(C[i] * ((h ** 2) * F[i] - K[i] * D[i - 1]))
 
 
+
+def solve():
+    y_values = [0.0 for i in xrange(N + 1)]
+    Yn = (B * h + betha1 * D[N - 1]) / (betha0 * h + betha1 * (C[N - 1] + 1))
+    y_values[N] = Yn
+    for i in xrange(N - 1, 0, -1):
+        y_values[i] = D[i] - C[i] * y_values[i + 1]
+    return y_values
+
+
+
+y_values = solve()
 
 result = zip(x_values, y_values)
-count = 0
-for item in result:
-    print count, item
-    count += 1
-
 
 plt.plot(x_values, y_values)
 plt.show()
